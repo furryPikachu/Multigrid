@@ -1,0 +1,181 @@
+// #include "Restriction.h"
+#include "MultigridPossion.h"
+#include "MGLevelOp.h"
+//#include "A.h"
+
+
+std::vector<Real> MultigridPossion::Full( int n,
+                                          std::vector<Real> &_fvalue,
+                                            Restriction &rest,
+                                            Interpolation & inter,
+                                          int nu_1, int nu_2,int nu_0)
+                         
+{
+  std::vector<Real> value ;
+  
+  if (n-1<4)
+    {
+      for(int i=0; i<3; i++)
+        value.push_back(0);
+      for (int i=0; i< nu_0; i++)
+        value = this->Vcycle( n, _fvalue, rest, inter, nu_1, nu_2, value);
+      
+      return value;
+    }
+  else
+    {
+      std::vector<Real> _fvalueCoarse;
+      _fvalueCoarse = rest.restriction(_fvalue);
+      value =  this->Full( n/2,_fvalueCoarse,rest,inter,nu_1,nu_2);  
+       }
+  value = inter.interpolation(value);
+  assert(value.size() == (n-1) );
+  for (int i=0; i< nu_0; i++)
+    value = this->Vcycle( n, _fvalue, rest, inter, nu_1, nu_2, value);
+  
+  return value; 
+}
+
+//template <> inline
+std::vector<Real> MultigridPossion::Vcycle( int that,
+                                            std::vector<Real> &_fvalue,
+                                            Restriction &rest,
+                                            Interpolation & inter,
+                                            int nu_1, int nu_2,
+                         std::vector<Real> &init) 
+{
+  // Real eps = this->eps;
+  int ngrid = that;
+  assert( init.size() == (ngrid-1) && init.size() == _fvalue.size());
+  Real h = 1.0/ngrid;
+  int n = ngrid-1;
+  std::vector<Real> guess = init;
+  std::vector<Real> residualValue = _fvalue;
+   GuessSeidel relax; 
+    std::vector<Real> valueCoarse;
+    Real x, y;
+    if (ngrid == gridsize)
+    {
+       x = this -> boundary[0];
+       y = this -> boundary[1];
+    } else
+      {
+        x = 0;
+        y = 0;
+      }
+    for(int k=0; k< nu_1; k++)
+      guess = relax.Smooth(residualValue, guess,x,y);
+    
+  assert(guess.size() == ngrid-1);
+  
+  if(n<4)
+    {
+      assert( n==3 );
+      assert( residualValue.size() == 3 );
+           
+      std::vector<Real> result;
+      BottomDirect bottom;
+      result = bottom.BottomSolver(3,residualValue);
+
+           std::cout<< " Bottom value"<< std::endl
+                    << result[0]<< ", "
+                    << result[1]<< ", "
+                    << result[2]<< ", ";
+      return result;
+    }
+  else
+    {
+      Resi Re;
+            
+      std::vector<Real> resifine = Re.residualGen( _fvalue, guess,x,y);
+      std::vector<Real> fvalueCoarse = rest.restriction(resifine);
+    
+      int n_2=(n-1)/2;
+      assert( n_2 == fvalueCoarse.size());
+      std::vector<Real> initCoarse(n_2,0.0);
+      assert( n_2 == initCoarse.size());
+      valueCoarse = this->Vcycle( (n+1)/2 ,fvalueCoarse, rest,
+                                  inter, nu_1, nu_2, initCoarse);
+            
+    }
+        
+        assert(valueCoarse.size() == (n-1)/2);
+          
+    std::vector<Real> valueFine = inter.interpolation(valueCoarse);
+    assert(valueFine.size() == n);
+    assert(guess.size() ==n);
+    for(int i =0; i<n ;i++ )
+      guess[i] += valueFine[i];
+
+    // std::cout<< "x = "<< x
+    //          << "y = "<< y;
+
+     for(int k=0; k< nu_2; k++)
+       guess = relax.Smooth(_fvalue,guess,x,y);
+   
+  return guess;
+  
+}
+
+
+//template<> inline
+// std::vector<Real> MultigridPossion::Relax(int _n, 
+//                                           std::vector<Real> &_fvalue,
+//                                           std::vector<Real> &initial,
+//                                           int nu_1, Real lamda ) 
+// {
+//   //_n=64
+//   int n= _n-1;
+//    Real h=1.0/_n;
+//   int _n2= (_n*_n);
+  
+//   std::vector<Real>  function=_fvalue;
+//    assert((_n-1) == (function).size());
+//      assert((_n-1) == (initial).size());
+
+//   double value[n];
+//   for(int j=0 ;j<n; j++)
+//     value[j]= initial[j]; 
+//    assert((_n-1) == initial.size());
+ 
+//     for(int i=0 ; i<nu_1; i++)
+//     {
+//       double UL[n*n];  
+//       for(int j=0 ; j< n-1 ; j++)
+//         {
+//           UL[(n+1)*j]=0;
+//           UL[(n+1)*j+1]=-(1.0)/(h*h);
+//           for(int k = 0; k< n-2; k++)
+//             UL[(n+1)*j+k+2]=0.0;
+//           UL[(n+1)*j+n]=-(1.0)/(h*h);
+//           }
+//       UL[n*n-1]=0;
+
+//       double y[n];
+//       for(int j=0 ;j<n; j++)
+//         y[j]=function[j];
+//       // y[j]=0;
+  
+//       cblas_dgemv(CblasColMajor, CblasNoTrans,
+//                   n, n, -0.5*(h*h), UL, n, value, 1, 0.5*h*h, y, 1 );
+
+//             // cblas_dgemv(CblasColMajor, CblasNoTrans,
+//             //       n, n, -0.0, UL, n, value, 1, 0.0*h2, y, 1 );
+//             for(int j=0 ; j<n ; j++)
+//               //  value[j] = value[j]*(1-lamda)+ lamda*temp[j];
+//                value[j] = value[j]*(1-lamda)+ lamda*y[j];
+//     }
+    
+//     std::vector<Real> result;
+//   for(int j=0 ;j<n; j++)
+//      result.push_back(value[j]);
+//   return result;
+//}
+
+      // std::vector<Real> temp;    
+      // temp.push_back (value[1]*0.5-(0.5*h2)*y[0]);
+      // for(int j=1; j<n-1 ; j++)
+      //   temp.push_back(0.5*(value[j-1]+value[j+1]-(0.5*h2)*y[j]));
+      // temp.push_back ( 0.5*value[n-2]-(0.5*h2)*y[n-2]);
+
+    
