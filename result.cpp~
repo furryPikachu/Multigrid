@@ -1,0 +1,98 @@
+#include "MultigridPossion.h"
+#include "Real.h"
+//#include "MultigridPossion.cpp"
+#include "Restriction.h"
+#include "Interpolation.h"
+#include "func.h"
+#include "MGLevelOp.h"
+
+
+int main(int argc, char *argv[])
+{
+  double x=exp(sin(1));
+  MultigridPossion mul(1.0 ,x, 6, 64);
+  //MultigridPossion mul(0.0 ,0.0, 6, 64);
+    MultigridPossion mul2(1.0 , x, 6, 128);
+
+
+     int n=64-1;
+     // std::vector<Real> guess(n, 0);
+     std::vector<Real> guess;
+     for(int i=0; i<n; i++)
+       guess.push_back( exp(sin(((i+1)/(n+1)))) );
+     std::vector<Real> guess_2(127, 0);
+     assert(guess_2.size() == 127);
+     // mul.boundary.push_back(0);
+     // std::cout << (mul.boundary)[1];
+     func1 _f;
+     mul.generatFuncValue(_f);
+     mul2.generatFuncValue(_f);
+     std::vector<Real> _fvalue;
+     for(int i=1; i<128; i++)
+       {
+         double x = i*(1.0/128);
+         _fvalue.push_back(-(cos(x)*cos(x)-sin(x))*exp(sin(x)));
+       }
+     /*For Test*/
+     // std::cout<< (mul.getFuncValue()).size();
+       // << mul.getGridsize()<< std::endl;
+     std::vector<Real> r=mul.Relax(128,_fvalue,guess_2,1000,2.0/3);
+     //  std::vector<Real> r2=mul2.Relax(128,guess2,2,2.0/3);
+     Linear _linear;
+     FullWeighting rest;
+
+
+     
+     
+      std::vector<Real>  v=mul2.Vcycle(128,_fvalue,rest,_linear,2,2,guess_2);
+      // std::vector<Real>  full=mul2.Full(128,_fvalue,rest,_linear,2,2,1);
+      for(int k =0; k< 4; k++)
+        {
+          //          mul2.gridsize= guess2.size()+1;
+          v=mul2.Vcycle(128,_fvalue,rest,_linear,2,2,v);
+        }
+
+       std::vector<Real> _result;
+     
+     for(int i=1; i<128; i++ )
+       {
+         _result.push_back(exp(sin((i*(1.0/128)))));
+       }
+  
+     // std::vector<Real> exact = exactAnswer(_f,64);
+       // for(int i=0; i< 127 ;i++)
+       //   std::cout<<r[i]<<":  ";
+       // std::cout<<"v-cycle"<<v.size()<<std::endl;
+       for(int i=0; i< v.size() ;i++)
+         std::cout<<v[i]<<", ";
+       std::cout <<" error"<< std::endl;
+        for(int i=0; i< v.size() ;i++)
+          std::cout<<v[i]-_result[i]<<", ";
+       //  std::cout<<"Full "<<std::endl;
+       //  for(int i=0; i< v.size() ;i++)
+       //   std::cout<<_result[i]<<", ";
+
+
+        bool TestLinear = true;
+        if(TestLinear == true)
+          {
+            MultigridPossion test3(0.0 ,1.0, 6, 64, 0.0000001);
+            std::vector<Real> _f;
+     
+            for(int i=1; i<64; i++ )
+              _f.push_back(i*(1.0/64));
+            std::vector<Real> init(63,0);
+            std::vector<Real>  v3=test3.Vcycle(64,init,rest,_linear,2,2,init);
+            for(int k =0; k<4; k++)
+              v3=test3.Vcycle(64,init,rest,_linear,2,2,v3);
+            
+             for(int i=0; i<64;i++)
+               std::cout<<v3[i]<<", "<<std::endl;
+          }
+        
+     
+    return 0;
+  }
+
+
+
