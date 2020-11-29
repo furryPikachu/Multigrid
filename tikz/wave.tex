@@ -1,0 +1,40 @@
+\documentclass{minimal}
+
+\usepackage{tikz}
+
+\usetikzlibrary{positioning}
+
+% 绘图所需的TikZ子库
+
+\usepackage[active,tightpage]{preview}
+
+% 用了preview之后你生成的pdf文件都可以直接用`\includegraphics`命令加入文本中
+
+\PreviewEnvironment{tikzpicture}
+
+\setlength\PreviewBorder{2mm} % 边距
+
+\begin{document}
+
+\begin{tikzpicture}
+% \draw[very thin,color=gray] (-0.1,-1.1) grid (3.9,8.1);
+
+% \draw[->,thick] (-0.5,0) -- (4,0) node[right] {$x$};
+
+% \draw[->,thick] (0,-1.2) -- (0,8.2) node[above] {$y$};
+
+\draw (0,0)--(pi,0);
+\foreach \n in {3,1,6}{
+\draw[domain=0: pi,samples=200,smooth] plot (\x,{sin(\x*\n r)}) ;
+ 
+}
+\node[above] at (pi*0.5,1){$k=1$};
+\node [right] at (pi, 0.5){$k=3$};
+\node [right] at (pi,-0.5){$k=6$};
+\end{tikzpicture}
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
