@@ -1,0 +1,425 @@
+\begin{defn}
+  A system of ordinary differential equations(ODEs)
+  of dimension $N$ is a set of differential equations of the form
+  \begin{equation}
+    \label{eq:ode}
+    \mathbf{u}'(t) = \mathbf{f}(\mathbf{u}(t),t),
+  \end{equation}
+  where $t$ is time,
+  $\mathbf{u}\in \mathbb{R}^N$ is the evolutionary varible,
+  and the RHS function has the signature
+  $\mathbf{f}:\mathbb{R}^N\times (0,+\infty)\rightarrow \mathbf{R}^N$.
+  In particular, (\ref{eq:ode}) is an ODE for $N=1$.
+\end{defn}
+
+\begin{defn}
+  A system of ODEs is \emph{linear} if its RHS function can be
+  expressed as
+  $\mathbf{f}(\mathbf{u},t)=\alpha(t)\mathbf{u}+\beta(t)$,
+  and \emph{nonliner} otherewise.
+\end{defn}
+
+\begin{exm}
+  For the simple pendulum shown above,
+  the moment of interial and the torque are
+  \begin{displaymath}
+    I=m\ell^2,\tau=-mg\ell\sin \theta,
+  \end{displaymath}
+  and the equation of motion can be derived from Newton's second
+  law $\tau=I\theta''(t)$ as
+  \begin{equation}\label{eq:motion}
+    \theta''(t)=-\frac{g}{\ell}\sin\theta,
+  \end{equation}
+  which admits a unique solution if we impose two initial conditions
+  \begin{displaymath}
+    \theta(0)=\theta_0,\theta'(0)=\omega_0.
+  \end{displaymath}
+  Alternatively, (\ref{eq:motion}) can be derived by the consideration
+  that the total energy remains a constant with respect to time.
+  \begin{displaymath}
+    \begin{aligned}
+      L=\frac{1}{2}m(\ell\theta')^2+mg\ell(1-\cos\theta);\\
+      \frac{\dif L}{\dif t}= 0\Rightarrow m\ell^2\theta'\theta''
+      +mg\ell \theta'\sin \theta=0.
+    \end{aligned}
+  \end{displaymath}
+  The ODE (\ref{eq:ode}) is second-order, nonlinear, and autonomous;
+  it can be reduced to a first-order system as follows,
+  \begin{displaymath}
+    \omega =\theta',\mathbf{u}=
+    \begin{pmatrix}
+      \theta\\
+      \omega
+    \end{pmatrix}
+    \Rightarrow m\ell^2\theta'\theta''+mg\ell\theta'\sin\theta =0.
+  \end{displaymath}
+\end{exm}
+
+\begin{defn}\label{defn:IVP}
+  Given $T>0$, $\mathbf{f}:\mathbb{R}^N\times [0,T]\rightarrow
+  \mathbb{R}^N$, and $\mathbf{u}_0\in \mathbb{R}^N,$
+  the \emph{initial value problem} (IVP) is to find
+  $\mathbf{u}(t)\in{\cal C}^1$ such that
+  \begin{equation}
+    \label{eq:ivp}
+    \begin{cases}
+      \mathbf{u}(0)=\mathbf{u}_0,\\
+      \mathbf{u}'(t)=\mathbf{f}(\mathbf{u}(t),t),\forall t\in [0,T].
+    \end{cases}
+  \end{equation}
+\end{defn}
+
+\begin{defn}
+  The IVP in Definiton \ref{defn:IVP} is \emph{well-posed} if
+  \begin{enumerate}
+  \item [(i)] it admits a unique solution for any fixed $t>0$,
+  \item [(ii)] $\exists c>0,\hat{\epsilon}>0$ s.t.
+    $\forall \epsilon< \hat{\epsilon}$, the perturbed IVP
+    \begin{equation}
+      \label{eq:perturbedIVP}
+      \mathbf{v}'=\mathbf{f}(\mathbf{v},t)+\mathbf{\delta}(t),
+      \quad,\mathbf{v}(0)=\mathbf{u}_0+\mathbf{\epsilon}_0
+    \end{equation}
+satisfies
+\begin{equation}
+  \forall t\in [0,T],
+  \begin{cases}
+    \Vert \mathbf{\epsilon}_0\Vert  < \epsilon\\
+    \Vert \mathbf{\delta}(t)\Vert 
+  \end{cases}
+  \Rightarrow \Vert \mathbf{u}(t)-\mathbf{v}(t)\Vert\leq c\epsilon.
+\end{equation}
+  \end{enumerate}
+\end{defn}
+
+\subsection{Lipschitz continuity}
+
+\label{sec:lipschitz-continuity}
+
+\begin{defn}
+  A function $\mathbf{f}:\mathbb{R}^N\times [0,+\infty)\rightarrow
+  \mathbb{R}^N$ is \emph{Lipschitz continuous} in its first variable
+  over some domain
+  \begin{equation}
+    \label{eq:domain}
+    {\cal D}=\{(\mathbf{u},t):\Vert\mathbf{u}-\mathbf{u}_0\Vert
+    \leq a,t\in [0,T]\}
+  \end{equation}
+if
+\begin{equation}
+  \exists L\geq 0 \textmd{ s.t. } \forall (\mathbf{u},t),
+  (\mathbf{v},t)\in {\cal D},\Vert \mathbf{f}(\mathbf{u},t)-\mathbf{f}
+  (\mathbf{v},t)\Vert\leq L\Vert \mathbf{u}-\mathbf{v}\Vert.
+\end{equation}
+\end{defn}
+
+\begin{exm}
+  If $\mathbf{f}(\mathbf{u},t)=\mathbf{f}(t)$, then $L=0$.
+\end{exm}
+
+\begin{exm}
+  If $\mathbf{f}\notin {\cal C}^0,$ then $\mathbf{f}$ is not Lipschitz.
+\end{exm}
+
+\begin{defn}
+  A subset of $S\subset\mathbb{R}^n$ is \emph{star-shaped} with
+  respect to a point $p\in S$ if for each $x\in S$ the line segment
+  from $p$ to $x$ lies in $S$.
+\end{defn}
+
+\begin{thm}\label{thm:star-shaped}
+  Let $S\subset \mathbb{R}^n$ be star-shaped with respect to
+  $p=(p_1,p_2,\ldots,p_n)\in S.$
+  For a continuously differentiable function $f: S\rightarrow
+  \mathbb{R}$,
+  there exist continuously differentiable functions $g_1(\mathbf{x}),
+  g_2(\mathbf{x}),\ldots,g_n(\mathbf{x})$ such that
+  \begin{equation}
+    f(\mathbf{x})=f(p)+\sum_{i=1}^{n}(x_i-p_i)g_i(\mathbf{x}),
+    g_i(p)=\frac{\partial f}{\partial x_i}(p).
+  \end{equation}
+\end{thm}
+
+\begin{prop}
+  If $\mathbf{f}(\mathbf{u},t)$ is continuously differentiable on some
+  compact convex set ${\cal D}\subseteq \mathbb{R}^{N+1}$,
+  then \textbf{f} is Lipschitz on ${\cal D}$ with
+  \begin{displaymath}
+    L=\max_{i,j}\left\vert \frac{\partial f_i}{\partial u_j}\right\vert.
+  \end{displaymath}
+\end{prop}
+
+\begin{lem}
+  Let $(M,\rho)$ denote a complete metric space and $\phi:M\rightarrow
+  M $ a contractive mapping in the sense that
+  \begin{equation}
+    \exists c\in [0,1], \textmd{ s.t.}
+\forall \eta,\zeta \in M, \rho(\phi(\eta),\phi(\zeta))\leq c\rho(\eta,\zeta).
+  \end{equation}
+\end{lem}
+
+\begin{thm}[Fundamental theorem of ODEs]
+If $\mathbf{f}(\mathbf{u}(t),t)$ is Lipschitz continuous in
+$\mathbf{u}$ and continuous in $t$ over some region ${\cal D}=\{(\mathbf{u},t):\Vert\mathbf{u}-\mathbf{u}_0\Vert\leq a,t\in [0,T]\}$,
+then there is a unique solution to the IVP problem as in Defintion
+\ref{defn:IVP} at least up to time $T^*=\min (T,\frac{a}{S})$
+where $S=\max_{(\mathbf{u},t)\in{\cal D}}\Vert \mathbf{f}(\mathbf{u},t)\Vert$
+\end{thm}
+
+\begin{defn}
+  If $\mathbf{f}(\mathbf{u},t)$ is Lipschitz in $\mathbf{u}$ and
+  continuous in $t$ on ${\cal
+    D}=\{(\mathbf{u},t):\Vert\mathbf{u}-\mathbf{u}_0\Vert\leq a,t\in
+  [0,T]\}$, then the IVP in Defintion \ref{defn:IVP} is well-posed
+  for all initial data.
+\end{defn}
+
+\begin{exm}
+  Consider $N=1,u'(t)=\sqrt{u(t)},u(0)=0.$
+  \begin{displaymath}
+    \lim_{u\rightarrow 0} f'(u)=\lim_{u\rightarrow 0}
+    \frac{1}{2\sqrt{u}}=+\infty.
+  \end{displaymath}
+  Hence $f(u)$ is not Lipschitz near $u=0$.
+  However, $u(t)\equiv 0$ and $u(t)=\frac{1}{4}t^2$ are both
+  solutions.
+  Hence the Lipschitz condition is not necessary for existence.
+\end{exm}
+
+\begin{exm}
+  Consider the IVP $u'(t)=u^2,u_0=\eta>0.$
+  The slope $f'(u)=2u \rightarrow +\infty$ as $u\rightarrow \infty$.
+  So there is no unique solution on $[0,+\infty),$ but there might
+  exist
+  $T^*$ such that unique solutions are guaranteed on $[0,T^*]$.
+
+  In fact, $u(t)=\frac{1}{\eta^{-1}-t}$ is a solution,
+  but blows up at $t=1/\eta.$
+  According to Theorem 
+\end{exm}
+
+
+\subsection{Some basic numerical methods}
+
+\label{sec:some-basic-numerical}
+\begin{ntn}
+  In the following, we shall use $k$ to denote the time step,
+  and thus $t_n=nk$.
+\end{ntn}
+
+To numerically solve the IVP (\ref{eq:ivp}) we are given
+initial data $\mathbf{U}^0=\mathbf{u}_0,$
+and want to compute approximations $\mathbf{U}^1,\mathbf{U^2},\ldots,$
+such that
+\begin{displaymath}
+  \mathbf{U}^n\approx \mathbf{u}(t_n).
+\end{displaymath}
+
+\begin{defn}
+  The \emph{forward Euler's method} solves the IVP (\ref{eq:ivp})
+  by
+  \begin{equation}
+    \mathbf{U}^{n+1} = \mathbf{U}^n+k\mathbf{f}(\mathbf{U}^n,t_n)
+  \end{equation}
+  which is based on replacing $\mathbf{u}'(t_{n})$ with the forward
+  difference $(\mathbf{U}^{n+1}-\mathbf{U}^n)/k$ and
+  $\mathbf{u}(t_{n})$
+  with $\mathbf{U}^{n}$ in $\mathbf{f}(\mathbf{u},t)$.
+\end{defn}
+
+\begin{defn}
+ The \emph{backward Euler's method} solves the IVP (\ref{eq:ivp})
+  by
+  \begin{equation}
+    \mathbf{U}^{n+1} = \mathbf{U}^n+k\mathbf{f}(\mathbf{U}^{n+1},t_{n+1})
+  \end{equation}
+  which is based on replacing $\mathbf{u}'(t_{n+1})$ with the backward
+  difference $(\mathbf{U}^{n+1}-\mathbf{U}^n)/k$ and
+  $\mathbf{u}(t_{n+1})$
+  with $\mathbf{U}^{n+1}$ in $\mathbf{f}(\mathbf{u},t)$.
+\end{defn}
+
+\begin{defn}
+  The \emph{trapezoidal method} is
+  \begin{equation}
+    \label{eq:trapezoidal}
+    \mathbf{U}^{n+1}=\mathbf{U}^n+\frac{k}{2}(\mathbf{f}(\mathbf{U}^{n},t_n),\mathbf{f}(\mathbf{U}^{n+1},t_{n+1})).
+  \end{equation}
+\end{defn}
+
+\begin{defn}
+  The \emph{midpoint (or leapfrog) method} is
+  \begin{equation}
+    \label{eq:midpoint}
+    \mathbf{U}^{n+1}=\mathbf{U}^{n-1}+2k\mathbf{f}(\mathbf{U}^{n},t_n).
+  \end{equation}
+\end{defn}
+
+\subsection{Accuracy and convergence}
+\label{sec:accuracy-convergence}
+
+\begin{defn}
+  The \emph{local truncation error}(LTE) is the error caused by
+  replacing
+  continuous derivatives with finite difference formulas.
+\end{defn}
+
+\begin{exm}
+  For the leapfrog method, the local truncation error is
+  \begin{displaymath}
+    \begin{aligned}
+      \mathbf{\tau}^n&=\frac{\mathbf{u}(t_{n+1})-\mathbf{u}(t_{n})}{2k}
+      -\mathbf{f}(\mathbf{u}(t_n),t_n)\\
+      &= \left [ \mathbf{u}'(t_n)+\frac{1}{6}k^2\mathbf{u}'''(t_n)+
+        O(k^4)\right ]-\mathbf{u}'(t_n)\\
+      &=\frac{1}{6}k^2\mathbf{u}'''(t_n)+O(k^4).
+    \end{aligned}
+  \end{displaymath}
+\end{exm}
+
+\begin{defn}
+  For a numerical method of the form
+  \begin{displaymath}
+    \mathbf{U}^{n+1}=\phi( \mathbf{U}^{n+1}, \mathbf{U}^{n},
+    \ldots, \mathbf{U}^{n-m}),
+  \end{displaymath}
+the \emph{one-step error} is defined by
+\begin{equation}
+  \label{eq:one-step}
+  {\cal L}^n:=\mathbf{u}(t_{n+1})-\phi(\mathbf{u}(t_{n+1}),
+  \mathbf{u}(t_{n}),\ldots,\mathbf{u}(t_{n-m})).
+\end{equation}
+\end{defn}
+
+\begin{exm}
+  For the leapfrog method, the one-step error is
+  \begin{displaymath}
+    \begin{aligned}
+      {\cal
+        L}^n&=\mathbf{u}(t_{n+1})-\mathbf{u}(t_{n-1})-2k\mathbf{f}(\mathbf{u}(t_n),t_n)\\
+      &=\frac{1}{3}k^3\mathbf{u}'''(t_n)+O(k^5)\\
+      &=2k\mathbf{\tau}^n
+    \end{aligned}
+  \end{displaymath}
+\end{exm}
+
+\begin{defn}
+  The \emph{solution error} of a numerical method for solving the IVP
+  in Definiton \ref{defn:IVP} is
+  \begin{equation}
+    \label{eq:solutionError}
+    \mathbf{E}^N:=\mathbf{U}^{T/k}-\mathbf{u}(T);\quad
+    \mathbf{E}^n=\mathbf{U}^n-\mathbf{u}(t_n).
+  \end{equation}
+\end{defn}
+
+\begin{defn}\label{defn:convergent}
+  A numerical method is convergent for a family of IVPs if the
+  application of it to any IVP with $\mathbf{f}(\mathbf{u},t)$
+  Lipschitz continuous in $\mathbf{u}$ and continuous in $t$ yields
+  \begin{equation}
+    \label{eq:convergence}
+    \lim_{\substack{k\rightarrow 0\\Nk=T}}=\mathbf{u}(T)
+  \end{equation} 
+for every fixed $T> 0$.
+\end{defn}
+
+\subsection{Analysis of Euler's method}
+
+\label{sec:analys-eulers-meth}
+
+\subsubsection{Linear IVPs}
+
+\label{sec:linear-ivps}
+In this section, we consider the convergence of Euler's method
+for solving linear IVPs of the form
+\begin{equation}
+  \label{eq:linearIVPs}
+  \begin{cases}
+    \mathbf{u}'(t)=\lambda\mathbf{u}(t)+\mathbf{g}(t),\\
+    \mathbf{u}(0)=\mathbf{u}_0,
+  \end{cases}
+\end{equation}
+where $\lambda$ is either a scalar or a diagonal matrix.
+
+\begin{lem}
+  Solution errors and the local truncation error of Euler's method
+  applied to the linear IVP (\ref{eq:linearIVPs}) satisfy
+  \begin{equation}
+    \label{eq:solutionErrorLinear}
+    \mathbf{E}^{n+1}=(1+k\lambda)\mathbf{E}^n-k\mathbf{\tau}^n.
+  \end{equation}
+\end{lem}
+
+\begin{lem}
+  The relation between the solution error $\mathbf{E}^n$ and the local
+  trucation error $\tau^n$ of Euler's method applied to the linear
+  IVP (\ref{eq:linearIVPs}) is
+  \begin{equation}
+    \label{eq:relationSoluLocal}
+    \mathbf{E}^n=(1=k\lambda)^n\mathbf{E}^0-k\sum_{m=1}^n
+    (1+k\lambda)^{n-m}\tau^{m-1}.
+  \end{equation}
+\end{lem}
+
+\begin{thm}
+  Euler's method is convergent for solving the linear IVP (\ref{eq:linearIVPs}).
+\end{thm}
+
+\subsubsection{Nonlinear IVPs}
+
+\label{sec:nonlinear-ivps}
+In this section, we consider the convergence of Euler's method
+for solving nonlinear IVPs of the form
+\begin{equation}\label{eq:nonlinarIVPs}
+  \mathbf{u}'(t)=\mathbf{f}(\mathbf{u}(t),t),
+\end{equation}
+with $\mathbf{f}(\mathbf{u},t)$ Lipschitz continuous in $\mathbf{u}$
+(with Lipschitz constant $L$)
+and continuous in $t$.
+
+\begin{lem}\label{lem:nonlinearError}
+  Under the above assumption, we have
+  \begin{equation}
+    \label{eq:nonlinearError}
+    \Vert \mathbf{E}^{n+1}\Vert \leq (1+kL)\Vert \mathbf{E}^{n}\Vert
+    +k\Vert \tau^{n}\Vert.
+  \end{equation}
+\end{lem}
+
+\begin{thm}
+  Under the same assumption as in Lemma \ref{lem:nonlinearError},
+  Euler's method is convergent.
+\end{thm}
+
+\subsubsection{Absolute stability}
+
+\label{sec:absolute-stability}
+\begin{exm}
+  Consider the ODE
+  \begin{displaymath}
+    u'(t)=\lambda(u-\cos t)-\sin t,
+  \end{displaymath}
+  with $\lambda=-2100$ and $u(0)=1.$
+  The exact solution is clearly
+  \begin{displaymath}
+    u(t)=\cos t.
+  \end{displaymath}
+  The following table shows the 
+\begin{verbatim}
+    k     |      E(T)  
+-----------------------
+2.00e-04  |   1.98e-08    
+4.00e-04  |   3.96e-08    
+8.00e-04  |   7.92e-08    
+9.50e-04  |   5.77e-08    
+9.76e-04  |   1.75e+36    
+1.00e-03  |   1.45e+76   
+\end{verbatim}
+\end{exm}
+
+%%% Local Variables:
+
+%%% mode: latex
+%%% TeX-master: "../notesNumericalSolution"
+%%% End:
